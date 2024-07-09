@@ -1,38 +1,43 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.logging.Logger;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
-@SuppressWarnings("preview")
 public class Reader {
 
-    private static final Logger LOGGER = Logger.getLogger(Reader.class.getName());
+    private static final int MAX_STATIONS_COUNT = 413;
 
-    public static void run() {
+    public static Map<String, TemperatureStats> run() {
 
-        long counter = 0;
-        int max = 50_000_000;
-        long startTime = System.nanoTime();
-        Collection<String> lines = new ArrayList<>();
+        Map<String, TemperatureStats> values = new HashMap<>(MAX_STATIONS_COUNT);
 
-        try (FileReader fileReader = new FileReader("measurements.txt"); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+        try (FileReader fileReader = new FileReader("measurements.txt", StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-            String line;
+            bufferedReader.lines()
+                    .parallel()
+                    .map(line -> line.split(";"))
+                    .forEach(splitLine -> {
 
-            while ((line = bufferedReader.readLine()) != null && max > counter) {
-                lines.add(line);
-                counter++;
-            }
+                        String station = splitLine[0];
+                        double temperature = Double.parseDouble(splitLine[1]);
 
-        } catch (IOException e) {
-            LOGGER.info(e.getMessage());
+                        if (values.containsKey(station)) {
+
+                            var temperatureStats = values.get(station);
+                            temperatureStats.addTemperature(temperature);
+
+                        } else {
+                            values.put(station, new TemperatureStats(temperature, 1, temperature, temperature));
+                        }
+                    });
+
+        } catch (IOException exception) {
+            exception.getStackTrace();
         }
 
-        long endTime = System.nanoTime();
-        long duration = endTime - startTime;
-
-        LOGGER.info(STR."It took \{duration}ms to retrieve all \{lines.size()} document lines");
+        return values;
     }
 }
