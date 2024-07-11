@@ -1,9 +1,11 @@
+package com.ricardo.onebillionrowschallenge;
+
 import java.util.Map;
 import java.util.logging.Logger;
 
-final class Main {
+final class App {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(App.class.getName());
 
     public static void main() {
         long startTime = System.nanoTime();

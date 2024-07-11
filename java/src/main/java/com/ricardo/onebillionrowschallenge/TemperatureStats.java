@@ -1,10 +1,18 @@
-public final class TemperatureStats {
+package com.ricardo.onebillionrowschallenge;
+
+final class TemperatureStats {
+
     private double temperaturesSum;
     private int temperaturesCount;
     private double min;
     private double max;
 
-    TemperatureStats(double temperaturesSum, int temperaturesCount, double min, double max) {
+    TemperatureStats(
+        double temperaturesSum,
+        int temperaturesCount,
+        double min,
+        double max
+    ) {
         this.temperaturesSum = temperaturesSum;
         this.temperaturesCount = temperaturesCount;
         this.min = min;
@@ -28,6 +36,10 @@ public final class TemperatureStats {
 
     @Override
     public String toString() {
-        return STR."\{getAverageTemperature()}º; " + STR."\{min}º; " + STR."\{max}º";
+        return (
+            STR."\{getAverageTemperature()}º; " +
+            STR."\{min}º; " +
+            STR."\{max}º"
+        );
     }
 }
