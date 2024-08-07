@@ -16,47 +16,43 @@ final class Reader {
 
     private static final int MAX_STATIONS_COUNT = 413;
 
-    public static Map<String, TemperatureStats> run() {
+    public static Map<String, TemperatureStats> run() throws IOException {
         Map<String, TemperatureStats> values = new HashMap<>(
             MAX_STATIONS_COUNT
         );
 
-        try (
-            FileReader fileReader = new FileReader(
-                "measurements.txt",
-                StandardCharsets.UTF_8
-            );
-            BufferedReader bufferedReader = new BufferedReader(fileReader)
-        ) {
-            LOGGER.info("Reading the file...");
+        FileReader fileReader = new FileReader(
+            "measurements.txt",
+            StandardCharsets.UTF_8
+        );
 
-            bufferedReader
-                .lines()
-                .parallel()
-                .map(line -> line.split(";"))
-                .forEach(splitLine -> {
-                    String station = splitLine[0];
-                    double temperature = Double.parseDouble(splitLine[1]);
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-                    if (values.containsKey(station)) {
-                        var temperatureStats = values.get(station);
-                        temperatureStats.addTemperature(temperature);
-                    } else {
-                        values.put(
-                            station,
-                            new TemperatureStats(
-                                temperature,
-                                1,
-                                temperature,
-                                temperature
-                            )
-                        );
-                    }
-                });
-        } catch (IOException exception) {
-            exception.getStackTrace();
-        }
+        LOGGER.info("Reading the file...");
 
+        bufferedReader
+            .lines()
+            .parallel()
+            .map(line -> line.split(";"))
+            .forEach(splitLine -> {
+                String station = splitLine[0];
+                double temperature = Double.parseDouble(splitLine[1]);
+
+                if (values.containsKey(station)) {
+                    var temperatureStats = values.get(station);
+                    temperatureStats.addTemperature(temperature);
+                } else {
+                    values.put(
+                        station,
+                        new TemperatureStats(
+                            temperature,
+                            1,
+                            temperature,
+                            temperature
+                        )
+                    );
+                }
+            });
         return values;
     }
 }
